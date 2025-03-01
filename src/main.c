@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <time.h>
 
+#define TRUE 1
+#define FALSE 0
 /*has to be at least 3 for the code to work*/
 #define TAPE_WIDTH 30
 #define WOLFRAM_CODE 30
@@ -10,18 +12,19 @@ typedef int tape;
 
 tape get_random();
 tape calc_next(tape t);
-void print_tape(tape t);
+void print_tape(tape t, int printzeros);
 
 int main()
 {
-	tape t = 0x34244103;
+	tape t /*= 0x34244103*/;
+	int i;
 	srand(time(NULL));
-	while (1)
-	{
-		print_tape(t);
+	t = get_random();
+	print_tape(t, FALSE);
+	for (i = 0; i < 100; i++){
+		print_tape(t, FALSE);
 		t = calc_next(t);
 	}
-
 	return EXIT_SUCCESS;
 }
 
@@ -49,10 +52,17 @@ tape calc_next(tape t)
 	return ret;
 }
 
-void print_tape(tape t)
+void print_tape(tape t, int printzeros)
 {
-	int i;
-	for (i = (TAPE_WIDTH - 1); i >= 0; i--)
-		printf("%i", (t >> i) & 1);
+	int i, bit;
+	for (i = (TAPE_WIDTH - 1); i >= 0; i--){
+		bit = ((t >> i) & 1);
+		if(bit == 1)
+			putchar('1');
+		else if(printzeros == TRUE)
+			putchar('0');
+		else
+			putchar(' ');
+	}
 	putchar('\n');
 }
