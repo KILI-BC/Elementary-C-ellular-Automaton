@@ -3,9 +3,9 @@
 #include <time.h>
 
 /*has to be at least 3 for the code to work*/
-#define TAPE_WIDTH 16
+#define TAPE_WIDTH 30
 #define WOLFRAM_CODE 30
-#define EVALUATE_CODE(c) ((WOLFRAM_CODE >> (c)) & 1)
+#define EVALUATE_CODE(c) ((WOLFRAM_CODE >> ((c) & 7)) & 1)
 typedef int tape;
 
 tape get_random();
@@ -14,15 +14,14 @@ void print_tape(tape t);
 
 int main()
 {
-	tape t;
+	tape t = 0x34244103;
 	srand(time(NULL));
-	t = get_random();
 	while (1)
 	{
 		print_tape(t);
 		t = calc_next(t);
 	}
-	
+
 	return EXIT_SUCCESS;
 }
 
@@ -39,14 +38,14 @@ tape calc_next(tape t)
 	tape ret = 0;
 
 	/*handle leftmost bit*/
-	ret |= EVALUATE_CODE(((t & 1) << 2) | ((t >> (TAPE_WIDTH - 2))& 3)) << (TAPE_WIDTH - 1);
+	ret |= (EVALUATE_CODE((t >> (TAPE_WIDTH - 2)) | (t << 2)) << (TAPE_WIDTH - 1));
 
 	/*handle middle bits*/
-	for (i = (TAPE_WIDTH - 2); i > 0; i++)
-		ret |= (EVALUATE_CODE((t >> (i - 1)) & 7) << i);
+	for (i = (TAPE_WIDTH - 2); i > 0; i--)
+		ret |= (EVALUATE_CODE(t >> (i - 1)) << i);
 
 	/*handle rightmost bit*/
-	ret |= EVALUATE_CODE(((t & 3) << 1) | (t >> (TAPE_WIDTH - 1)));
+	ret |= EVALUATE_CODE((t << 1) | (t >> (TAPE_WIDTH - 1)));
 	return ret;
 }
 
